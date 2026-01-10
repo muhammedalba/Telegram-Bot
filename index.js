@@ -5,21 +5,21 @@ import express from "express";
 const app = express();
 app.use(express.json());
 //posting commands
-bot.onText(/\/start/, (msg) => {
-  if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
-    bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
-    return;
-  }
-  startBot(msg.chat.id);
-});
+// bot.onText(/\/start/, (msg) => {
+//   if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
+//     bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
+//     return;
+//   }
+//   startBot(msg.chat.id);
+// });
 
-bot.onText(/\/stop/, (msg) => {
-  if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
-    bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
-    return;
-  }
-  stopBot(msg.chat.id);
-});
+// bot.onText(/\/stop/, (msg) => {
+//   if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
+//     bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
+//     return;
+//   }
+//   stopBot(msg.chat.id);
+// });
 
 app.post("/webhook", async (req, res) => {
   const update = req.body;
@@ -52,7 +52,7 @@ const shutdown = async () => {
   console.log("✅ Bot shut down successfully.");
   process.exit(0);
 };
-console.log("server is running");
+
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
