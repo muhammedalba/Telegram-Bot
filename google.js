@@ -8,8 +8,8 @@ import {
 
 let creds;
 try {
-  // creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
-  creds = JSON.parse(fs.readFileSync(CREDS_FILE, "utf8"));
+  creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
+  // creds = JSON.parse(fs.readFileSync(CREDS_FILE, "utf8"));
 } catch (error) {
   console.error("❌ Error loading credentials:", error.message);
   process.exit(1);
