@@ -27,9 +27,10 @@ const shutdown = async () => {
   console.log("✅ Bot shut down successfully.");
   process.exit(0);
 };
+console.log('server is running');
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
 // Start the bot immediately
-startBot(ADMIN_CHAT_ID);
+// startBot(ADMIN_CHAT_ID);

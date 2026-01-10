@@ -118,13 +118,13 @@ export function scheduleNextPost() {
   });
 }
 
-export function startBot(chatId) {
+export async function startBot(chatId) {
   if (isRunning) {
-    bot.sendMessage(chatId, "✅ Bot is already running.");
+    await bot.sendMessage(chatId, "✅ Bot is already running.");
     return;
   }
   isRunning = true;
-  bot.sendMessage(
+ await bot.sendMessage(
     chatId,
     `🚀 Bot started! Posting all new deals with delay of ${
       POST_DELAY / 1000
@@ -133,9 +133,9 @@ export function startBot(chatId) {
   scheduleNextPost();
 }
 
-export function stopBot(chatId) {
+export async function stopBot(chatId) {
   if (!isRunning) {
-    bot.sendMessage(chatId, "ℹ️ Bot is not running.");
+    await bot.sendMessage(chatId, "ℹ️ Bot is not running.");
     return;
   }
   isRunning = false;
@@ -143,7 +143,7 @@ export function stopBot(chatId) {
     clearTimeout(timeoutId);
     timeoutId = null;
   }
-  bot.sendMessage(
+ await bot.sendMessage(
     chatId,
     "⏹️ Bot stopped! No more deals will be posted automatically."
   );

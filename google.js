@@ -8,12 +8,6 @@ import {
 
 let creds;
 try {
-  console.log("CREDS length:", process.env.GOOGLE_CREDENTIALS_JSON?.length);
-  console.log(
-    "CREDS first char:",
-    process.env.GOOGLE_CREDENTIALS_JSON?.charAt(0)
-  );
-
   creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
   // creds = JSON.parse(fs.readFileSync(CREDS_FILE, "utf8"));
 } catch (error) {
