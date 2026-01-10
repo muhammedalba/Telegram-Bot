@@ -1,66 +1,182 @@
 import { bot, startBot, stopBot } from "./bot.js";
-import { ADMIN_CHAT_ID } from "./config.js";
+import { ADMIN_CHAT_ID, PORT, BOT_TOKEN, WEBHOOK_URL } from "./config.js";
 import express from "express";
-// Express app for Webhook
+
+// ===== Express App Setup =====
 const app = express();
 app.use(express.json());
-//posting commands
-// bot.onText(/\/start/, (msg) => {
-//   if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
-//     bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
-//     return;
-//   }
-//   startBot(msg.chat.id);
-// });
 
-// bot.onText(/\/stop/, (msg) => {
-//   if (String(msg.chat.id) !== ADMIN_CHAT_ID) {
-//     bot.sendMessage(msg.chat.id, "⛔ You are not authorized.");
-//     return;
-//   }
-//   stopBot(msg.chat.id);
-// });
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString() 
+  });
+});
 
+// ===== Middleware للتحقق من الصلاحيات =====
+const checkAuth = async (chatId) => {
+  if (String(chatId) !== String(ADMIN_CHAT_ID)) {
+    await bot.sendMessage(chatId, "⛔ غير مصرح لك باستخدام هذا الأمر.");
+    return false;
+  }
+  return true;
+};
+
+// ===== معالج الأوامر =====
+const handleCommand = async (chatId, command) => {
+  const commands = {
+    "/start": async () => {
+      await startBot(chatId);
+    },
+    "/stop": async () => {
+      await stopBot(chatId);
+    },
+    "/status": async () => {
+      await bot.sendMessage(chatId, "✅ البوت يعمل بشكل طبيعي");
+    },
+    "/help": async () => {
+      const helpText = `
+📋 الأوامر المتاحة:
+
+/start - تشغيل البوت
+/stop - إيقاف البوت
+/status - التحقق من حالة البوت
+/help - عرض هذه الرسالة
+      `;
+      await bot.sendMessage(chatId, helpText.trim());
+    }
+  };
+
+  const handler = commands[command];
+  if (handler) {
+    await handler();
+  } else {
+    await bot.sendMessage(chatId, "❌ أمر غير معروف. استخدم /help لعرض الأوامر المتاحة.");
+  }
+};
+
+// ===== Webhook Endpoint =====
 app.post("/webhook", async (req, res) => {
-  const update = req.body;
-  console.log("Received update:", req.body);
-  if (update.message && update.message.text) {
-    const chatId = update.message.chat.id;
-    const text = update.message.text;
-
-    if (String(chatId) !== ADMIN_CHAT_ID) {
-      await bot.sendMessage(
-        chatId,
-        "⛔ You are not authorized to use this command."
-      );
+  try {
+    const update = req.body;
+    console.log('update',update);
+    
+    // التحقق من صحة البيانات الواردة
+    if (!update || !update.message) {
       return res.sendStatus(200);
     }
 
-    if (text === "/start") await startBot(chatId);
-    if (text === "/stop") await stopBot(chatId);
-  }
+    const { chat, text } = update.message;
+    
+    if (!text || !chat) {
+      return res.sendStatus(200);
+    }
 
-  res.sendStatus(200);
+    const chatId = chat.id;
+
+    // التحقق من الصلاحيات
+    if (!(await checkAuth(chatId))) {
+      return res.sendStatus(200);
+    }
+
+    // معالجة الأمر
+    await handleCommand(chatId, text);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("❌ خطأ في معالجة webhook:", error.message);
+    res.sendStatus(500);
+  }
 });
 
-// cleanup on exit
-const shutdown = async () => {
-  console.log("\n⏹️ Shutting down bot...");
-  stopBot(ADMIN_CHAT_ID);
-  await new Promise((r) => setTimeout(r, 1000));
-  bot.stopPolling();
-  console.log("✅ Bot shut down successfully.");
-  process.exit(0);
+// ===== إعداد Webhook (اختياري) =====
+const setupWebhook = async () => {
+  try {
+    const webhookUrl = `${WEBHOOK_URL}/webhook`;
+    
+    // حذف webhook القديم
+    await bot.deleteWebHook();
+    
+    // تعيين webhook جديد
+    await bot.setWebHook(webhookUrl);
+    
+    console.log(`✅ تم تعيين Webhook: ${webhookUrl}`);
+  } catch (error) {
+    console.error("❌ فشل إعداد Webhook:", error.message);
+  }
 };
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+// ===== Graceful Shutdown =====
+const shutdown = async (signal) => {
+  console.log(`\n⏹️ تلقي إشارة ${signal}... إيقاف البوت...`);
+  
+  try {
+    // إيقاف البوت
+    await stopBot(ADMIN_CHAT_ID);
+    
+    // إعطاء وقت للعمليات الجارية
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    // إيقاف polling/webhook
+    if (bot.isPolling()) {
+      await bot.stopPolling();
+    }
+    
+    // إغلاق Express server
+    if (server) {
+      server.close(() => {
+        console.log("✅ تم إغلاق الخادم بنجاح");
+      });
+    }
+    
+    console.log("✅ تم إيقاف البوت بنجاح");
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ خطأ أثناء الإيقاف:", error.message);
+    process.exit(1);
+  }
+};
 
-// Start the bot immediately
-// startBot(ADMIN_CHAT_ID);
-// ===== Start Express server =====
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
-  await bot.sendMessage(ADMIN_CHAT_ID, `Server started on port ${PORT}`);
+// معالجة إشارات الإيقاف
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+// معالجة الأخطاء غير المتوقعة
+process.on("uncaughtException", (error) => {
+  console.error("❌ خطأ غير متوقع:", error);
+  shutdown("uncaughtException");
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ رفض غير معالج:", reason);
+  shutdown("unhandledRejection");
+});
+
+// ===== بدء الخادم =====
+const server = app.listen(PORT, async () => {
+  console.log(`🚀 الخادم يعمل على المنفذ ${PORT}`);
+  
+  try {
+    // إرسال إشعار للمسؤول
+    await bot.sendMessage(
+      ADMIN_CHAT_ID, 
+      `✅ تم تشغيل الخادم على المنفذ ${PORT}\n⏰ ${new Date().toLocaleString("ar-EG")}`
+    );
+    
+    // إعداد webhook إذا لزم الأمر
+    await setupWebhook();
+    
+    // تشغيل البوت تلقائياً (اختياري)
+    // await startBot(ADMIN_CHAT_ID);
+    
+  } catch (error) {
+    console.error("❌ خطأ في بدء التشغيل:", error.message);
+  }
+});
+
+// معالجة أخطاء الخادم
+server.on("error", (error) => {
+  console.error("❌ خطأ في الخادم:", error.message);
+  process.exit(1);
 });

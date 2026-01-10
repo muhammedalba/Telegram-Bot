@@ -13,6 +13,7 @@ import { escapeHTML, isImageURLValid } from "./utils.js";
 // export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
 export let bot = new TelegramBot(BOT_TOKEN);
 bot.setWebHook(`${WEBHOOK_URL}/webhook`);
+
 let timeoutId = null;
 export let isRunning = false;
 
@@ -55,9 +56,11 @@ export async function postAllDeals() {
 <b>🔥🔥 Angebot 🔥🔥</b>
 
 <b>✨ Produkt:</b> ${escapeHTML(row.title)}
+
 <b>💰 Preis:</b> ✅ ${escapeHTML(row.price)}€ ❌ <s>${escapeHTML(
         row.old_price
       )}€</s>
+
 <b>Rabatt:</b> -${escapeHTML(row.discount)}%
 
 #Amazon
