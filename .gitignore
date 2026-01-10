@@ -18,9 +18,11 @@ pnpm-debug.log*
 # =========================
 # Google credentials (Service Account)
 # =========================
-*.json
+# Ignore only sensitive JSON files
 credentials.json
 google-creds.json
+service-account.json
+
 
 # =========================
 # Logs
