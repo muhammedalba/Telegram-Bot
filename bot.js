@@ -9,20 +9,22 @@ import {
 import { getUnpublishedDeals, markDealAsPosted } from "./google.js";
 import { escapeHTML, isImageURLValid } from "./utils.js";
 
-export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
+// export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
+export let bot = new TelegramBot(BOT_TOKEN);
+bot.setWebHook(`${process.env.WEBHOOK_URL}/webhook`);
 let timeoutId = null;
 export let isRunning = false;
 
 export async function postAllDeals() {
   const timestamp = new Date().toLocaleString("en-US", {
-    timeZone: "Europe/Berlin",   
+    timeZone: "Europe/Berlin",
     weekday: "long", //  Monday, Tuesday...
     year: "numeric", //  2026
     month: "long", //  January, February...
     day: "numeric", //  10
     hour: "2-digit", //  08
-    minute: "2-digit", 
-    second: "2-digit", 
+    minute: "2-digit",
+    second: "2-digit",
     hour12: true, // 12-hour format مع AM/PM
   });
   console.log(`[${timestamp}] 🔍 Searching for new deals...`);
@@ -52,7 +54,9 @@ export async function postAllDeals() {
 <b>🔥🔥 Angebot 🔥🔥</b>
 
 <b>✨ Produkt:</b> ${escapeHTML(row.title)}
-<b>💰 Preis:</b> ✅ ${escapeHTML(row.price)}€ ❌ <s>${escapeHTML(row.old_price)}€</s>
+<b>💰 Preis:</b> ✅ ${escapeHTML(row.price)}€ ❌ <s>${escapeHTML(
+        row.old_price
+      )}€</s>
 <b>Rabatt:</b> -${escapeHTML(row.discount)}%
 
 #Amazon
@@ -124,7 +128,7 @@ export async function startBot(chatId) {
     return;
   }
   isRunning = true;
- await bot.sendMessage(
+  await bot.sendMessage(
     chatId,
     `🚀 Bot started! Posting all new deals with delay of ${
       POST_DELAY / 1000
@@ -143,7 +147,7 @@ export async function stopBot(chatId) {
     clearTimeout(timeoutId);
     timeoutId = null;
   }
- await bot.sendMessage(
+  await bot.sendMessage(
     chatId,
     "⏹️ Bot stopped! No more deals will be posted automatically."
   );
