@@ -90,22 +90,6 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-// ===== إعداد Webhook (اختياري) =====
-const setupWebhook = async () => {
-  try {
-    const webhookUrl = `${WEBHOOK_URL}/webhook`;
-    
-    // حذف webhook القديم
-    await bot.deleteWebHook();
-    
-    // تعيين webhook جديد
-    await bot.setWebHook(webhookUrl);
-    
-    console.log(`✅ تم تعيين Webhook: ${webhookUrl}`);
-  } catch (error) {
-    console.error("❌ فشل إعداد Webhook:", error.message);
-  }
-};
 
 // ===== Graceful Shutdown =====
 const shutdown = async (signal) => {
@@ -163,9 +147,9 @@ const server = app.listen(PORT, async () => {
       ADMIN_CHAT_ID, 
       `✅ تم تشغيل الخادم على المنفذ ${PORT}\n⏰ ${new Date().toLocaleString("ar-EG")}`
     );
-    
     // إعداد webhook إذا لزم الأمر
     await setupWebhook();
+    // 
     
     // تشغيل البوت تلقائياً (اختياري)
     // await startBot(ADMIN_CHAT_ID);

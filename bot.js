@@ -12,7 +12,6 @@ import { escapeHTML, isImageURLValid } from "./utils.js";
 
 // export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
 export let bot = new TelegramBot(BOT_TOKEN);
-bot.setWebHook(`${WEBHOOK_URL}/webhook`);
 
 let timeoutId = null;
 export let isRunning = false;
@@ -156,3 +155,20 @@ export async function stopBot(chatId) {
     "⏹️ Bot stopped! No more deals will be posted automatically."
   );
 }
+
+// ===== إعداد Webhook (اختياري) =====
+export async function  setupWebhook() {
+  try {
+    const webhookUrl = `${WEBHOOK_URL}/webhook`;
+    
+    // حذف webhook القديم
+    await bot.deleteWebHook();
+    
+    // تعيين webhook جديد
+    await bot.setWebHook(webhookUrl);
+    
+    console.log(`✅ تم تعيين Webhook: ${webhookUrl}`);
+  } catch (error) {
+    console.error("❌ فشل إعداد Webhook:", error.message);
+  }
+};

@@ -15,7 +15,7 @@ export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 export const PORT = process.env.PORT || 3000;
 export const WEBHOOK_URL =
-  process.env.WEBHOOK_URL || "https://telegram-bot-fdjt.onrender.com/webhook";
+  process.env.WEBHOOK_URL;
 
 if (
   !BOT_TOKEN ||
