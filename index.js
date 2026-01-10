@@ -1,5 +1,5 @@
-import { bot, startBot, stopBot } from "./bot.js";
-import { ADMIN_CHAT_ID, PORT, BOT_TOKEN, WEBHOOK_URL } from "./config.js";
+import { bot, setupWebhook, startBot, stopBot } from "./bot.js";
+import { ADMIN_CHAT_ID, PORT } from "./config.js";
 import express from "express";
 
 // ===== Express App Setup =====
