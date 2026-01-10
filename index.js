@@ -23,7 +23,7 @@ app.use(express.json());
 
 app.post("/webhook", async (req, res) => {
   const update = req.body;
-
+console.log("Received update:", req.body);
   if (update.message && update.message.text) {
     const chatId = update.message.chat.id;
     const text = update.message.text;
