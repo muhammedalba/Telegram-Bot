@@ -5,13 +5,14 @@ import {
   ADMIN_CHAT_ID,
   POST_INTERVAL,
   POST_DELAY,
+  WEBHOOK_URL,
 } from "./config.js";
 import { getUnpublishedDeals, markDealAsPosted } from "./google.js";
 import { escapeHTML, isImageURLValid } from "./utils.js";
 
 // export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
 export let bot = new TelegramBot(BOT_TOKEN);
-bot.setWebHook(`${process.env.WEBHOOK_URL}/webhook`);
+bot.setWebHook(`${WEBHOOK_URL}/webhook`);
 let timeoutId = null;
 export let isRunning = false;
 
