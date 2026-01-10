@@ -9,6 +9,7 @@ export const CHANNEL_ID = process.env.CHANNEL_ID;
 export const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
 
 export const CREDS_FILE = process.env.CREDS_FILE;
+export const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_CREDENTIALS_JSON;
 export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 if (
