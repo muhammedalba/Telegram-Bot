@@ -49,6 +49,8 @@ const handleCommand = async (chatId, command) => {
 /start - تشغيل البوت
 /stop - إيقاف البوت
 /status - التحقق من حالة البوت
+/restart - إعادة تشغيل البوت
+/info - الحصول على معلومات عن البوت
 /help - عرض هذه الرسالة
       `;
       await bot.sendMessage(chatId, helpText.trim());

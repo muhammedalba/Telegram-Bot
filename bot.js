@@ -167,15 +167,39 @@ export async function stopBot(chatId) {
 export async function getBotInfo() {
   try {
     const me = await bot.getMe();
+
+    const message = `
+🤖 معلومات البوت
+-----------------------
+🆔 رقم البوت: ${me.id}
+👤 اسم البوت: ${me.first_name}
+🔗 اسم المستخدم: @${me.username}
+🤖 هل هو بوت؟: ${me.is_bot ? "نعم" : "لا"}
+
+⚙️ الصلاحيات والإعدادات
+-----------------------
+👥 يمكنه الانضمام إلى المجموعات: ${me.can_join_groups ? "نعم" : "لا"}
+📖 يمكنه قراءة جميع رسائل المجموعات: ${me.can_read_all_group_messages ? "نعم" : "لا"}
+🔎 يدعم البحث المضمّن (Inline): ${me.supports_inline_queries ? "نعم" : "لا"}
+🏢 يمكنه الاتصال بحسابات الأعمال: ${me.can_connect_to_business ? "نعم" : "لا"}
+🌐 لديه Web App رئيسي: ${me.has_main_web_app ? "نعم" : "لا"}
+🗂️ يدعم المواضيع (Topics): ${me.has_topics_enabled ? "نعم" : "لا"}
+`.trim();
+
     console.log("Bot Info:", me);
-    await bot.sendMessage(ADMIN_CHAT_ID, "Bot Info:", me);
-    return me;
+    await bot.sendMessage(ADMIN_CHAT_ID, message);
+
   } catch (error) {
     console.error("Error getting bot info:", error);
-    await bot.sendMessage(ADMIN_CHAT_ID, `Error getting bot info: ${error}`);
-    return null;
+    await bot.sendMessage(
+      ADMIN_CHAT_ID,
+      `❌ حدث خطأ أثناء جلب معلومات البوت:\n${error.message || error}`
+    );
   }
 }
+
+
+
 // ===== إعداد Webhook (اختياري) =====
 export async function setupWebhook() {
   try {
