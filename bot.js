@@ -97,8 +97,6 @@ export async function postAllDeals() {
         });
 
         await markDealAsPosted(row);
-        console.log(`✅ Deal posted: ${row.title}`);
-        // await bot.sendMessage(ADMIN_CHAT_ID, `✅ Deal posted: ${row.title}`);
 
         await new Promise((r) => setTimeout(r, POST_DELAY));
         successCount++;
@@ -165,7 +163,19 @@ export async function stopBot(chatId) {
     "⏹️ Bot stopped! No more deals will be posted automatically."
   );
 }
-
+// get me function to check bot info
+export async function getBotInfo() {
+  try {
+    const me = await bot.getMe();
+    console.log("Bot Info:", me);
+    await bot.sendMessage(ADMIN_CHAT_ID, "Bot Info:", me);
+    return me;
+  } catch (error) {
+    console.error("Error getting bot info:", error);
+    await bot.sendMessage(ADMIN_CHAT_ID, `Error getting bot info: ${error}`);
+    return null;
+  }
+}
 // ===== إعداد Webhook (اختياري) =====
 export async function setupWebhook() {
   try {

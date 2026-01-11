@@ -1,4 +1,4 @@
-import { bot, setupWebhook, startBot, stopBot } from "./bot.js";
+import { bot, setupWebhook, startBot, stopBot, getBotInfo } from "./bot.js";
 import { ADMIN_CHAT_ID, PORT } from "./config.js";
 import express from "express";
 
@@ -8,9 +8,9 @@ app.use(express.json());
 
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.status(200).json({ 
-    status: "ok", 
-    timestamp: new Date().toISOString() 
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -32,6 +32,13 @@ const handleCommand = async (chatId, command) => {
     "/stop": async () => {
       await stopBot(chatId);
     },
+    "/restart": async () => {
+      await stopBot(chatId);
+      await startBot(chatId);
+    },
+    "/info": async () => {
+      await getBotInfo();
+    },
     "/status": async () => {
       await bot.sendMessage(chatId, "✅ البوت يعمل بشكل طبيعي");
     },
@@ -45,14 +52,17 @@ const handleCommand = async (chatId, command) => {
 /help - عرض هذه الرسالة
       `;
       await bot.sendMessage(chatId, helpText.trim());
-    }
+    },
   };
 
   const handler = commands[command];
   if (handler) {
     await handler();
   } else {
-    await bot.sendMessage(chatId, "❌ أمر غير معروف. استخدم /help لعرض الأوامر المتاحة.");
+    await bot.sendMessage(
+      chatId,
+      "❌ أمر غير معروف. استخدم /help لعرض الأوامر المتاحة."
+    );
   }
 };
 
@@ -60,15 +70,13 @@ const handleCommand = async (chatId, command) => {
 app.post("/webhook", async (req, res) => {
   try {
     const update = req.body;
-    console.log('update',update);
-    
     // التحقق من صحة البيانات الواردة
     if (!update || !update.message) {
       return res.sendStatus(200);
     }
 
     const { chat, text } = update.message;
-    
+
     if (!text || !chat) {
       return res.sendStatus(200);
     }
@@ -90,30 +98,29 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-
 // ===== Graceful Shutdown =====
 const shutdown = async (signal) => {
   console.log(`\n⏹️ تلقي إشارة ${signal}... إيقاف البوت...`);
-  
+
   try {
     // إيقاف البوت
     await stopBot(ADMIN_CHAT_ID);
-    
+
     // إعطاء وقت للعمليات الجارية
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    
+
     // إيقاف polling/webhook
     if (bot.isPolling()) {
       await bot.stopPolling();
     }
-    
+
     // إغلاق Express server
     if (server) {
       server.close(() => {
         console.log("✅ تم إغلاق الخادم بنجاح");
       });
     }
-    
+
     console.log("✅ تم إيقاف البوت بنجاح");
     process.exit(0);
   } catch (error) {
@@ -140,20 +147,21 @@ process.on("unhandledRejection", (reason, promise) => {
 // ===== بدء الخادم =====
 const server = app.listen(PORT, async () => {
   console.log(`🚀 الخادم يعمل على المنفذ ${PORT}`);
-  
+
   try {
     // إرسال إشعار للمسؤول
     await bot.sendMessage(
-      ADMIN_CHAT_ID, 
-      `✅ تم تشغيل الخادم على المنفذ ${PORT}\n⏰ ${new Date().toLocaleString("ar-EG")}`
+      ADMIN_CHAT_ID,
+      `✅ تم تشغيل الخادم على المنفذ ${PORT}\n⏰ ${new Date().toLocaleString(
+        "ar-EG"
+      )}`
     );
     // إعداد webhook إذا لزم الأمر
     await setupWebhook();
-    // 
-    
+    //
+
     // تشغيل البوت تلقائياً (اختياري)
     // await startBot(ADMIN_CHAT_ID);
-    
   } catch (error) {
     console.error("❌ خطأ في بدء التشغيل:", error.message);
   }
