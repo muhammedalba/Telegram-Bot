@@ -35,6 +35,10 @@ export async function postAllDeals() {
   try {
     const unpublishedRows = await getUnpublishedDeals();
     console.log(`ℹ️ Found ${unpublishedRows.length} new deals. sending now...`);
+    await bot.sendMessage(
+      ADMIN_CHAT_ID,
+      `ℹ️ Found ${unpublishedRows.length} new deals. sending now...`
+    );
 
     if (unpublishedRows.length === 0) {
       console.log("ℹ️ No new deals to post.");
