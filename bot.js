@@ -34,6 +34,7 @@ export async function postAllDeals() {
 
   try {
     const unpublishedRows = await getUnpublishedDeals();
+    console.log(`ℹ️ Found ${unpublishedRows.length} new deals. sending now...`);
 
     if (unpublishedRows.length === 0) {
       console.log("ℹ️ No new deals to post.");
@@ -65,7 +66,7 @@ export async function postAllDeals() {
         row.old_price
       )}€</s>
 
-<b>Rabatt:</b> -${escapeHTML(row.discount)}
+<b>🎁 Rabatt:</b> -${escapeHTML(row.discount)}
 
 <b>#${escapeHTML(row.source)}</b>
 
@@ -93,7 +94,7 @@ export async function postAllDeals() {
 
         await markDealAsPosted(row);
         console.log(`✅ Deal posted: ${row.title}`);
-        await bot.sendMessage(ADMIN_CHAT_ID, `✅ Deal posted: ${row.title}`);
+        // await bot.sendMessage(ADMIN_CHAT_ID, `✅ Deal posted: ${row.title}`);
 
         await new Promise((r) => setTimeout(r, POST_DELAY));
         successCount++;
