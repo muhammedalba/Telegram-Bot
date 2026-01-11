@@ -65,7 +65,7 @@ export async function postAllDeals() {
         row.old_price
       )}€</s>
 
-<b>Rabatt:</b> -${escapeHTML(row.discount)}%
+<b>Rabatt:</b> -${escapeHTML(row.discount)}
 
 <b>#${escapeHTML(row.source)}</b>
 
