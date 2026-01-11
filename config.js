@@ -14,8 +14,8 @@ export const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_CREDENTIALS_JSON;
 export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 export const PORT = process.env.PORT || 3000;
-export const WEBHOOK_URL =
-  process.env.WEBHOOK_URL;
+export const WEBHOOK_URL =process.env.WEBHOOK_URL;
+export const AMAZON_Tag=process.env.AMAZON_Tag;
 
 if (
   !BOT_TOKEN ||
@@ -24,6 +24,7 @@ if (
   !CREDS_FILE ||
   !WEBHOOK_URL ||
   !GOOGLE_CREDENTIALS_JSON ||
+  !AMAZON_Tag ||
   !SPREADSHEET_ID
 ) {
   console.error("❌ Missing environment variables.");

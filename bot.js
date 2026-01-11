@@ -6,9 +6,10 @@ import {
   POST_INTERVAL,
   POST_DELAY,
   WEBHOOK_URL,
+  AMAZON_Tag,
 } from "./config.js";
 import { getUnpublishedDeals, markDealAsPosted } from "./google.js";
-import { escapeHTML, isImageURLValid } from "./utils.js";
+import { escapeHTML, isImageURLValid , buildDisplayAmazonLink, extractASIN } from "./utils.js";
 
 // export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
 export let bot = new TelegramBot(BOT_TOKEN);
@@ -50,6 +51,10 @@ export async function postAllDeals() {
         );
         break;
       }
+      const asin = extractASIN(row.link);
+      const displayLink = asin
+        ? buildDisplayAmazonLink(asin, AMAZON_Tag)
+        : row.link;
 
       const message = `
 <b>🔥🔥 Angebot 🔥🔥</b>
@@ -62,10 +67,10 @@ export async function postAllDeals() {
 
 <b>Rabatt:</b> -${escapeHTML(row.discount)}%
 
-#Amazon
+<b>#${escapeHTML(row.source)}</b>
 
 ⬇️ <b>Kauf-Link:</b> ⬇️
-${escapeHTML(row.link)}
+<a href="${row.link}">${displayLink}</a>
 `;
 
       try {
@@ -157,18 +162,18 @@ export async function stopBot(chatId) {
 }
 
 // ===== إعداد Webhook (اختياري) =====
-export async function  setupWebhook() {
+export async function setupWebhook() {
   try {
     const webhookUrl = `${WEBHOOK_URL}/webhook`;
-    
+
     // حذف webhook القديم
     await bot.deleteWebHook();
-    
+
     // تعيين webhook جديد
     await bot.setWebHook(webhookUrl);
-    
+
     console.log(`✅ تم تعيين Webhook: ${webhookUrl}`);
   } catch (error) {
     console.error("❌ فشل إعداد Webhook:", error.message);
   }
-};
+}
