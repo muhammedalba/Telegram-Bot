@@ -1,4 +1,4 @@
-import { bot, setupWebhook, startBot, stopBot, getBotInfo } from "./bot.js";
+import { bot, setupWebhook, startBot, stopBot, getBotInfo, clearAllProducts } from "./bot.js";
 import { ADMIN_CHAT_ID, PORT } from "./config.js";
 import express from "express";
 
@@ -55,6 +55,10 @@ const handleCommand = async (chatId, command) => {
       `;
       await bot.sendMessage(chatId, helpText.trim());
     },
+    './remove_all_products': async () => {
+       await clearAllProducts()
+      
+    }
   };
 
   const handler = commands[command];

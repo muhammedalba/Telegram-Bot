@@ -8,8 +8,17 @@ import {
   WEBHOOK_URL,
   AMAZON_Tag,
 } from "./config.js";
-import { getUnpublishedDeals, markDealAsPosted } from "./google.js";
-import { escapeHTML, isImageURLValid , buildDisplayAmazonLink, extractASIN } from "./utils.js";
+import {
+  getUnpublishedDeals,
+  markDealAsPosted,
+  clearAllProducts,
+} from "./google.js";
+import {
+  escapeHTML,
+  isImageURLValid,
+  buildDisplayAmazonLink,
+  extractASIN,
+} from "./utils.js";
 
 // export let bot = new TelegramBot(BOT_TOKEN, { polling: true });
 export let bot = new TelegramBot(BOT_TOKEN);
@@ -72,7 +81,7 @@ export async function postAllDeals() {
 
 <b>🎁 Rabatt:</b> -${escapeHTML(row.discount)}
 
-<b>#${escapeHTML(row.source)}</b>
+<b>#${escapeHTML(row.source)} #Deal #Angebot #Sale</b>
 
 ⬇️ <b>Kauf-Link:</b> ⬇️
 <a href="${row.link}">${displayLink}</a>
@@ -179,7 +188,9 @@ export async function getBotInfo() {
 ⚙️ الصلاحيات والإعدادات
 -----------------------
 👥 يمكنه الانضمام إلى المجموعات: ${me.can_join_groups ? "نعم" : "لا"}
-📖 يمكنه قراءة جميع رسائل المجموعات: ${me.can_read_all_group_messages ? "نعم" : "لا"}
+📖 يمكنه قراءة جميع رسائل المجموعات: ${
+      me.can_read_all_group_messages ? "نعم" : "لا"
+    }
 🔎 يدعم البحث المضمّن (Inline): ${me.supports_inline_queries ? "نعم" : "لا"}
 🏢 يمكنه الاتصال بحسابات الأعمال: ${me.can_connect_to_business ? "نعم" : "لا"}
 🌐 لديه Web App رئيسي: ${me.has_main_web_app ? "نعم" : "لا"}
@@ -188,7 +199,6 @@ export async function getBotInfo() {
 
     console.log("Bot Info:", me);
     await bot.sendMessage(ADMIN_CHAT_ID, message);
-
   } catch (error) {
     console.error("Error getting bot info:", error);
     await bot.sendMessage(
@@ -197,8 +207,20 @@ export async function getBotInfo() {
     );
   }
 }
-
-
+// clear All Products
+export async function clearAllProducts() {
+  try {
+    await clearAllProducts();
+    console.log("✅ All products cleared from the sheet.");
+    await bot.sendMessage(ADMIN_CHAT_ID, "✅ All products cleared from the sheet.");
+  } catch (error) {
+    console.error("❌ Error clearing products:", error);
+    await bot.sendMessage(
+      ADMIN_CHAT_ID,
+      `❌ Error clearing products: ${error.message || error}`
+    );
+  }
+}
 
 // ===== إعداد Webhook (اختياري) =====
 export async function setupWebhook() {

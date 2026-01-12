@@ -32,3 +32,10 @@ export async function markDealAsPosted(row) {
   row.posted = "yes";
   await row.save();
 }
+//  clear all products from sheet
+export async function clearAllProducts() {
+  await doc.useServiceAccountAuth(creds);
+  // const sheet = doc.sheetsByIndex[0];
+  const sheet = doc.sheetsByTitle['angebote'];
+  await sheet.clearAllRows(sheet.sheetId);
+}
