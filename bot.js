@@ -11,7 +11,7 @@ import {
 import {
   getUnpublishedDeals,
   markDealAsPosted,
-  clearAllProducts,
+  clearAllRowsFromSheet,
 } from "./google.js";
 import {
   escapeHTML,
@@ -210,7 +210,7 @@ export async function getBotInfo() {
 // clear All Products
 export async function clearAllProducts() {
   try {
-    await clearAllProducts();
+    await clearAllRowsFromSheet();
     console.log("✅ All products cleared from the sheet.");
     await bot.sendMessage(ADMIN_CHAT_ID, "✅ All products cleared from the sheet.");
   } catch (error) {

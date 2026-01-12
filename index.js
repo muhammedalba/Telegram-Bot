@@ -52,10 +52,11 @@ const handleCommand = async (chatId, command) => {
 /restart - إعادة تشغيل البوت
 /info - الحصول على معلومات عن البوت
 /help - عرض هذه الرسالة
+/remove_all_products - إزالة جميع المنتجات من الجدول
       `;
       await bot.sendMessage(chatId, helpText.trim());
     },
-    './remove_all_products': async () => {
+    '/remove_all_products': async () => {
        await clearAllProducts()
       
     }

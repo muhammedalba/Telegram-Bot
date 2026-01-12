@@ -4,11 +4,14 @@ import {
   CREDS_FILE,
   SPREADSHEET_ID,
   GOOGLE_CREDENTIALS_JSON,
+  ENVIRONMENT
 } from "./config.js";
 
 let creds;
+
+
 try {
-  if (creds ) {
+  if (ENVIRONMENT==="development")  {
     creds = JSON.parse(fs.readFileSync(CREDS_FILE, "utf8"));
   }
   creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
@@ -33,7 +36,7 @@ export async function markDealAsPosted(row) {
   await row.save();
 }
 //  clear all products from sheet
-export async function clearAllProducts() {
+export async function clearAllRowsFromSheet() {
   await doc.useServiceAccountAuth(creds);
   // const sheet = doc.sheetsByIndex[0];
   const sheet = doc.sheetsByTitle['angebote'];

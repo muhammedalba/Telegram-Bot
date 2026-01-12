@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
-import e from "express";
+
+
 dotenv.config();
+
+export const ENVIRONMENT = process.env.ENVIRONMENT ?? "production";
 
 export const POST_INTERVAL = (process.env.POST_INTERVAL || 30) * 60 * 1000; // 30 m
 export const POST_DELAY = process.env.POST_DELAY || 5000; // 5 s
