@@ -39,7 +39,7 @@ export async function clearAllRowsFromSheet(sheetId, keepHeader = true) {
   await doc.useServiceAccountAuth(creds);
   await doc.loadInfo();
   const sheet = doc.sheetsByIndex[0];
-//  const sheet = doc.sheetsByTitle["angebote"];
+  //  const sheet = doc.sheetsByTitle["angebote"];
   if (!sheet) {
     throw new Error("Sheet not found");
   }
@@ -53,14 +53,12 @@ export async function clearAllRowsFromSheet(sheetId, keepHeader = true) {
 
   const startIndex = keepHeader ? 1 : 0;
 
-  await this._makeSingleUpdateRequest("deleteDimension", {
+  await doc._makeSingleUpdateRequest("deleteDimension", {
     range: {
-      sheetId: sheetId,
+      sheetId: sheet.sheetId,
       dimension: "ROWS",
       startIndex: startIndex,
       endIndex: totalRows,
     },
   });
 }
-
-
